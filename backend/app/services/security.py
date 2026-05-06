@@ -1,0 +1,11 @@
+import secrets
+from fastapi import Request
+
+def generate_job_token() -> str:
+    return secrets.token_urlsafe(32)
+
+def get_client_ip(request: Request) -> str:
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"

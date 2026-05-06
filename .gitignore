@@ -1,0 +1,17 @@
+.env
+.env.local
+storage/uploads/*
+storage/outputs/*
+!storage/uploads/.gitkeep
+!storage/outputs/.gitkeep
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+node_modules/
+.next/
+.DS_Store
+*.log
+celerybeat-schedule
+celerybeat.pid
+nginx/ssl/
