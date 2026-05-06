@@ -84,7 +84,7 @@ export default function ToolPage({ params }: Props) {
 
         {/* Disclaimer */}
         <div className="mb-14 px-5 py-4 rounded-2xl text-sm" style={{background:'rgba(251,191,36,0.08)', border:'1px solid rgba(251,191,36,0.25)', color:'rgba(253,230,138,0.85)'}}>
-          <strong>Disclaimer:</strong> By uploading files, you confirm that you own or have explicit permission to process all uploaded media. Do not upload copyrighted content without authorization.
+          <strong>Disclaimer:</strong> By uploading files, you confirm that you own or have explicit permission to process all uploaded media. Do not upload copyrighted content authorization.
         </div>
 
         {/* FAQ */}

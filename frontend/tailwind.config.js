@@ -8,18 +8,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: '#f0f4ff',
-          100: '#e0e9ff',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          900: '#1e1b4b',
-        },
+        blue: { primary: '#1a6ef2', dark: '#0f4fc4', deeper: '#0c3a96' },
+        green: { accent: '#4ade80' },
       },
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-      },
+      fontFamily: { sans: ['Inter', 'sans-serif'] },
     },
   },
   plugins: [],

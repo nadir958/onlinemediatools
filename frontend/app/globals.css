@@ -3,19 +3,114 @@
 @tailwind components;
 @tailwind utilities;
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { background: #0a0a1a; color: #f1f5f9; font-family: 'Inter', sans-serif; }
-
-.gradient-text {
-  background: linear-gradient(135deg, #818cf8, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+:root {
+  --blue-primary: #1a6ef2;
+  --blue-dark:    #0f4fc4;
+  --blue-deeper:  #0c3a96;
+  --green-accent: #4ade80;
+  --white:        #ffffff;
 }
 
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--blue-primary);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glass card */
 .glass-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Green accent text */
+.accent-green { color: var(--green-accent); }
+
+/* White pill button */
+.btn-white {
+  background: #ffffff;
+  color: var(--blue-primary);
+  font-weight: 700;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  display: inline-block;
+  text-align: center;
+}
+.btn-white:hover {
+  background: #f0f6ff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* Outline pill button */
+.btn-outline {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255,255,255,0.5);
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  display: inline-block;
+  text-align: center;
+}
+.btn-outline:hover {
+  border-color: #ffffff;
+  background: rgba(255,255,255,0.1);
+}
+
+/* Section divider */
+.section-dark {
+  background: var(--blue-dark);
+}
+.section-deeper {
+  background: var(--blue-deeper);
+}
+
+/* Upload area */
+.upload-zone {
+  border: 2px dashed rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.08);
+  border-radius: 1.25rem;
+  transition: all 0.2s ease;
+}
+.upload-zone:hover, .upload-zone.dragging {
+  border-color: var(--green-accent);
+  background: rgba(74,222,128,0.08);
+}
+.upload-zone.has-file {
+  border-color: var(--green-accent);
+  background: rgba(74,222,128,0.1);
+}
+
+/* Green badge */
+.badge-green {
+  background: rgba(74,222,128,0.2);
+  color: var(--green-accent);
+  border: 1px solid rgba(74,222,128,0.4);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.85rem;
+}
+
+/* FAQ accordion */
+.faq-item {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 0.875rem;
+  overflow: hidden;
+}
+.faq-item:hover {
+  background: rgba(255,255,255,0.12);
 }

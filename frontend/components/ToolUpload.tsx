@@ -45,50 +45,66 @@ export default function ToolUpload({ tool }: { tool: Tool }) {
   return (
     <div className="w-full max-w-2xl mx-auto">
       {!jobId ? (
-        <div className="space-y-4">
+        <div className="space-y-5">
+          {/* Drop zone */}
           <div
             onDrop={onDrop}
             onDragOver={e => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
             onClick={() => inputRef.current?.click()}
-            className={`relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all
-              ${dragging ? 'border-indigo-400 bg-indigo-500/10 scale-[1.01]' : 'border-white/20 hover:border-indigo-500/50 hover:bg-white/5'}
-              ${file ? 'border-green-500/50 bg-green-500/5' : ''}`}
+            className={`upload-zone p-12 text-center cursor-pointer ${dragging ? 'dragging' : ''} ${file ? 'has-file' : ''}`}
           >
             <input ref={inputRef} type="file" className="hidden" accept={tool.accepts.join(',')} onChange={onFileChange} />
             {file ? (
               <div>
-                <div className="text-4xl mb-2">✅</div>
-                <p className="text-white font-semibold">{file.name}</p>
-                <p className="text-sm text-slate-400">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-3xl" style={{background:'rgba(74,222,128,0.2)', border:'2px solid #4ade80'}}>✅</div>
+                <p className="text-white font-bold text-lg">{file.name}</p>
+                <p className="text-white/60 text-sm mt-1">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+                <p className="text-green-400 text-sm mt-2 font-medium" style={{color:'#4ade80'}}>Ready to convert</p>
               </div>
             ) : (
               <div>
-                <div className="text-5xl mb-4">{tool.icon}</div>
-                <p className="text-lg font-semibold text-white">Drop your file here or click to browse</p>
-                <p className="text-sm text-slate-400 mt-2">Accepts: {tool.accepts.join(', ')} — Max 200 MB</p>
+                <div className="text-5xl mb-5">{tool.icon}</div>
+                <p className="text-xl font-bold text-white">Drop your file here</p>
+                <p className="text-white/60 mt-2">or <span className="text-white font-semibold underline decoration-dotted cursor-pointer">click to browse</span></p>
+                <p className="text-white/40 text-sm mt-4">Supports: {tool.accepts.join(', ').toUpperCase()} — Max 200 MB</p>
               </div>
             )}
           </div>
 
           <ToolOptions tool={tool} values={options} onChange={(k, v) => setOptions(prev => ({ ...prev, [k]: v }))} />
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && (
+            <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{background:'rgba(239,68,68,0.15)', border:'1px solid rgba(239,68,68,0.4)', color:'#fca5a5'}}>
+              {error}
+            </div>
+          )}
 
           <button
             onClick={handleSubmit}
             disabled={!file || loading}
-            className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-lg rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.99]"
+            className="btn-white w-full py-4 text-lg font-bold rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
+            style={{fontSize:'1.05rem'}}
           >
-            {loading ? 'Uploading...' : `Convert Now →`}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                Uploading...
+              </span>
+            ) : `Convert Now →`}
           </button>
-          <p className="text-xs text-slate-500 text-center">By uploading, you confirm you own or have permission to process this file.</p>
+          <p className="text-xs text-white/40 text-center">By uploading, you confirm you own or have permission to process this file.</p>
         </div>
       ) : (
         <div>
           <JobStatusComp jobId={jobId} onComplete={setCompleted} />
           {completed && <DownloadResult job={completed} />}
-          <button onClick={reset} className="mt-4 text-sm text-slate-400 hover:text-white underline transition-colors">Convert another file</button>
+          <button onClick={reset} className="mt-5 text-sm text-white/50 hover:text-white underline decoration-dotted transition-colors">
+            ← Convert another file
+          </button>
         </div>
       )}
     </div>
