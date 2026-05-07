@@ -1,13 +1,23 @@
 'use client';
+import { getCopy } from '@/lib/copy';
+import type { Locale } from '@/lib/i18n';
 import { JobStatus } from '@/lib/api';
 
-interface Props { job: JobStatus; }
+interface Props {
+  job: JobStatus;
+  locale: Locale;
+}
 
-export default function DownloadResult({ job }: Props) {
+function formatText(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce((acc, [key, value]) => acc.replace(`{${key}}`, value), template);
+}
+
+export default function DownloadResult({ job, locale }: Props) {
+  const copy = getCopy(locale).upload;
   if (job.status !== 'completed' || !job.download_url) return null;
   return (
     <div className="mt-6 p-5 bg-green-500/10 border border-green-500/30 rounded-xl">
-      <p className="text-green-400 font-semibold mb-3">Conversion complete!</p>
+      <p className="text-green-400 font-semibold mb-3">{copy.complete}</p>
       <a
         href={job.download_url}
         download
@@ -16,10 +26,12 @@ export default function DownloadResult({ job }: Props) {
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
-        Download File
+        {copy.download}
       </a>
       {job.expires_at && (
-        <p className="text-xs text-slate-400 mt-3">File available until {new Date(job.expires_at).toLocaleTimeString()} (auto-deleted after 2h)</p>
+        <p className="text-xs text-slate-400 mt-3">
+          {formatText(copy.availableUntil, { time: new Date(job.expires_at).toLocaleTimeString(locale === 'fr' ? 'fr-FR' : 'en-US') })}
+        </p>
       )}
     </div>
   );

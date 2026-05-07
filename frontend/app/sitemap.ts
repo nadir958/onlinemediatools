@@ -1,19 +1,35 @@
 import { MetadataRoute } from 'next';
+import { LOCALES, localizePath } from '@/lib/i18n';
+import { SITE_URL } from '@/lib/seo';
 import { getAllSlugs } from '@/lib/tools';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://onlinemediatools.com';
-
 export default function sitemap(): MetadataRoute.Sitemap {
-  const toolPages = getAllSlugs().map(slug => ({
-    url: `${SITE_URL}/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.8,
-  }));
+  const now = new Date();
+  const pages: MetadataRoute.Sitemap = [];
 
-  return [
-    { url: SITE_URL, lastModified: new Date(), changeFrequency: 'weekly', priority: 1.0 },
-    { url: `${SITE_URL}/tools`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-    ...toolPages,
-  ];
+  for (const locale of LOCALES) {
+    pages.push({
+      url: `${SITE_URL}${localizePath('/', locale)}`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: locale === 'en' ? 1.0 : 0.9,
+    });
+    pages.push({
+      url: `${SITE_URL}${localizePath('/tools', locale)}`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    });
+
+    for (const slug of getAllSlugs()) {
+      pages.push({
+        url: `${SITE_URL}${localizePath(`/${slug}`, locale)}`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.8,
+      });
+    }
+  }
+
+  return pages;
 }

@@ -1,23 +1,27 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import { getCopy } from '@/lib/copy';
+import type { Locale } from '@/lib/i18n';
 import { pollJob, JobStatus as IJobStatus } from '@/lib/api';
 
 interface Props {
   jobId: string;
   onComplete: (job: IJobStatus) => void;
+  locale: Locale;
 }
 
-export default function JobStatus({ jobId, onComplete }: Props) {
+export default function JobStatus({ jobId, onComplete, locale }: Props) {
   const [job, setJob] = useState<IJobStatus | null>(null);
+  const copy = getCopy(locale).upload;
 
   const poll = useCallback(async () => {
     try {
-      const data = await pollJob(jobId);
+      const data = await pollJob(jobId, copy.statusFailed);
       setJob(data);
       if (data.status === 'completed') onComplete(data);
       return data.status;
     } catch { return 'error'; }
-  }, [jobId, onComplete]);
+  }, [jobId, onComplete, copy.statusFailed]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -34,7 +38,7 @@ export default function JobStatus({ jobId, onComplete }: Props) {
     return () => clearInterval(interval);
   }, [poll]);
 
-  if (!job) return <div className="mt-6 text-slate-400 text-sm animate-pulse">Starting job...</div>;
+  if (!job) return <div className="mt-6 text-slate-400 text-sm animate-pulse">{copy.startingJob}</div>;
 
   const statusColor = {
     pending: 'text-yellow-400',
@@ -43,10 +47,16 @@ export default function JobStatus({ jobId, onComplete }: Props) {
     failed: 'text-red-400',
   }[job.status] || 'text-slate-400';
 
+  const label = job.status === 'processing'
+    ? copy.processing
+    : locale === 'fr'
+      ? { pending: 'En attente', completed: 'Terminé', failed: 'Échec' }[job.status] || job.status
+      : job.status;
+
   return (
     <div className="mt-6 space-y-3">
       <div className={`text-sm font-semibold ${statusColor} capitalize`}>
-        {job.status === 'processing' ? 'Processing your file...' : job.status}
+        {label}
       </div>
       {(job.status === 'pending' || job.status === 'processing') && (
         <div className="w-full bg-white/10 rounded-full h-2">
@@ -57,7 +67,7 @@ export default function JobStatus({ jobId, onComplete }: Props) {
         </div>
       )}
       {job.status === 'failed' && (
-        <p className="text-sm text-red-400">{job.error_message || 'Processing failed. Please try again.'}</p>
+        <p className="text-sm text-red-400">{job.error_message || copy.failed}</p>
       )}
     </div>
   );

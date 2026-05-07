@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://onlinemediatools.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://onlinemediatools.cc';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,3 +8,4 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }
+

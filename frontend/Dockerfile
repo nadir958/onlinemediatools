@@ -1,4 +1,8 @@
 FROM node:20-alpine AS builder
+ARG FRONTEND_URL
+ARG API_URL
+ENV FRONTEND_URL=${FRONTEND_URL}
+ENV API_URL=${API_URL}
 WORKDIR /app
 COPY package.json ./
 RUN npm install --legacy-peer-deps
