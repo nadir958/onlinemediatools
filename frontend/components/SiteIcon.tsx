@@ -9,12 +9,17 @@ export type IconName =
   | 'audioConverter'
   | 'videoConverter'
   | 'trimVideo'
+  | 'transcribeAudio'
+  | 'autoSubtitle'
+  | 'translateSubtitles'
+  | 'cleanAudio'
   | 'noSignup'
   | 'secure'
   | 'autoDelete'
   | 'fastProcessing'
   | 'videoCategory'
   | 'audioCategory'
+  | 'aiCategory'
   | 'fileReady'
   | 'check';
 
@@ -34,12 +39,17 @@ const ICONS: Record<IconName, string> = {
   audioConverter: '🎼',
   videoConverter: '🎬',
   trimVideo: '✂️',
+  transcribeAudio: '📝',
+  autoSubtitle: '💬',
+  translateSubtitles: '🌍',
+  cleanAudio: '🎙️',
   noSignup: '👤',
   secure: '🛡️',
   autoDelete: '🕒',
   fastProcessing: '⚡',
   videoCategory: '🎥',
   audioCategory: '🎶',
+  aiCategory: '🤖',
   fileReady: '✅',
   check: '✓',
 };
@@ -57,8 +67,8 @@ function mapSizeToText(className: string) {
 export default function SiteIcon({ name, className = 'w-6 h-6' }: SiteIconProps) {
   const textSize = mapSizeToText(className);
   const passthrough = className
-    .replace(/w-\S+/g, '')
-    .replace(/h-\S+/g, '')
+    .replace(/\bw-\S+/g, '')
+    .replace(/\bh-\S+/g, '')
     .trim();
 
   return (

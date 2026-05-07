@@ -1,15 +1,42 @@
 import Link from 'next/link';
+import TrackedLink from '@/components/analytics/TrackedLink';
 import SiteIcon from '@/components/SiteIcon';
 import FAQ from '@/components/FAQ';
 import { getCopy } from '@/lib/copy';
 import { localizePath, type Locale } from '@/lib/i18n';
 import { buildFaqSchema, buildOrganizationSchema, buildWebsiteSchema } from '@/lib/seo';
-import { getTools } from '@/lib/tools';
+import { getTools, type Tool } from '@/lib/tools';
+
+function homeSectionDescriptions(locale: Locale) {
+  if (locale === 'fr') {
+    return {
+      ai: 'Transcription, sous-titres, traduction et nettoyage audio pour vos workflows de publication et de documentation.',
+      utilities: 'Conversions, compression, coupe et extraction audio pour finaliser les fichiers après traitement IA.',
+    };
+  }
+  if (locale === 'es') {
+    return {
+      ai: 'Transcripción, subtítulos, traducción y limpieza de audio para flujos de publicación y documentación.',
+      utilities: 'Conversión, compresión, recorte y extracción de audio para terminar los archivos después del paso IA.',
+    };
+  }
+  return {
+    ai: 'Transcription, subtitles, translation, and audio cleanup for publishing, documentation, and media localization workflows.',
+    utilities: 'Conversion, compression, trimming, and audio extraction for the cleanup and delivery steps after AI processing.',
+  };
+}
 
 export default function HomePage({ locale }: { locale: Locale }) {
   const copy = getCopy(locale);
   const tools = getTools(locale);
+  const featuredAiSlugs = ['transcribe-audio', 'auto-subtitle', 'translate-subtitles', 'clean-audio'];
+  const supportingUtilitySlugs = ['extract-audio', 'compress-video', 'video-converter', 'trim-video'];
+  const isTool = (tool: Tool | undefined): tool is Tool => Boolean(tool);
+  const featuredAiTools = featuredAiSlugs.map(slug => tools.find(tool => tool.slug === slug)).filter(isTool);
+  const supportingTools = supportingUtilitySlugs.map(slug => tools.find(tool => tool.slug === slug)).filter(isTool);
+  const sectionCopy = homeSectionDescriptions(locale);
   const categories = [
+    { label: copy.shared.categories.aiTools, icon: 'aiCategory' as const, tools: featuredAiSlugs },
     { label: copy.shared.categories.videoTools, icon: 'videoCategory' as const, tools: ['webm-to-mp4', 'mov-to-mp4', 'compress-video', 'trim-video', 'video-converter'] },
     { label: copy.shared.categories.audioTools, icon: 'audioCategory' as const, tools: ['mp4-to-mp3', 'video-to-mp3', 'extract-audio', 'remove-audio-from-video', 'audio-converter'] },
   ];
@@ -21,24 +48,32 @@ export default function HomePage({ locale }: { locale: Locale }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildFaqSchema(copy.home.faq)) }} />
 
       <section className="relative overflow-hidden py-28 px-4 text-center">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.08) 0%, transparent 70%)' }} />
-        <div className="relative max-w-4xl mx-auto">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(74,222,128,0.14) 0%, transparent 70%)' }} />
+        <div className="relative max-w-5xl mx-auto">
           <span className="badge-green inline-block mb-6">{copy.home.badge}</span>
           <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight tracking-tight">
             {copy.home.title}<br />
             <span style={{ color: '#4ade80' }}>{copy.home.highlight}</span> {copy.home.titleSuffix}
           </h1>
-          <p className="mt-6 text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
             {copy.home.descriptionTop}<br />
             {copy.home.descriptionBottom}
           </p>
           <div className="mt-10 flex flex-wrap gap-4 justify-center">
-            <Link href={localizePath('/webm-to-mp4', locale)} className="btn-white px-8 py-3.5 text-base">
+            <TrackedLink
+              href={localizePath('/transcribe-audio', locale)}
+              className="btn-white px-8 py-3.5 text-base"
+              eventParams={{ cta_name: 'hero_primary', cta_label: copy.home.primaryCta, cta_location: 'hero', destination: '/transcribe-audio', locale }}
+            >
               {copy.home.primaryCta}
-            </Link>
-            <Link href={localizePath('/tools', locale)} className="btn-outline px-8 py-3.5 text-base">
+            </TrackedLink>
+            <TrackedLink
+              href={localizePath('/auto-subtitle', locale)}
+              className="btn-outline px-8 py-3.5 text-base"
+              eventParams={{ cta_name: 'hero_secondary', cta_label: copy.home.secondaryCta, cta_location: 'hero', destination: '/auto-subtitle', locale }}
+            >
               {copy.home.secondaryCta}
-            </Link>
+            </TrackedLink>
           </div>
         </div>
       </section>
@@ -56,19 +91,62 @@ export default function HomePage({ locale }: { locale: Locale }) {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 py-20">
-        <h2 className="text-3xl font-black text-white text-center mb-2">{copy.home.popularTools}</h2>
-        <p className="text-white/50 text-center mb-10">{copy.home.popularToolsSub}</p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {tools.slice(0, 5).map(tool => (
-            <Link key={tool.slug} href={localizePath(`/${tool.slug}`, locale)} className="group glass-card rounded-2xl p-6 text-center transition-all hover:-translate-y-1">
-              <SiteIcon name={tool.icon} className="w-10 h-10 mx-auto mb-3 text-white group-hover:text-green-400 transition-colors" />
-              <div className="text-sm font-bold text-white group-hover:text-green-400 transition-colors" style={{ color: 'inherit' }}>{tool.title}</div>
+        <div className="max-w-3xl">
+          <h2 className="text-3xl font-black text-white mb-2">{copy.home.popularTools}</h2>
+          <p className="text-white/50 mb-10">{copy.home.popularToolsSub}</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {featuredAiTools.map(tool => (
+            <Link key={tool.slug} href={localizePath(`/${tool.slug}`, locale)} className="group glass-card rounded-2xl p-6 transition-all hover:-translate-y-1">
+              <SiteIcon name={tool.icon} className="w-10 h-10 mb-4 text-white group-hover:text-green-400 transition-colors" />
+              <div className="text-lg font-bold text-white group-hover:text-green-400 transition-colors mb-2" style={{ color: 'inherit' }}>{tool.title}</div>
+              <p className="text-sm text-white/60 leading-relaxed">{tool.description}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 pb-8">
+      <section className="max-w-7xl mx-auto px-4 pb-8">
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="glass-card rounded-2xl p-7">
+            <div className="flex items-center gap-3 mb-4">
+              <SiteIcon name="aiCategory" className="w-6 h-6 text-green-400" />
+              <h2 className="text-2xl font-bold text-white">{copy.shared.categories.aiTools}</h2>
+            </div>
+            <p className="text-sm text-white/65 leading-relaxed mb-6">{sectionCopy.ai}</p>
+            <div className="space-y-3">
+              {featuredAiTools.map(tool => (
+                <Link key={tool.slug} href={localizePath(`/${tool.slug}`, locale)} className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-all group">
+                  <SiteIcon name={tool.icon} className="w-5 h-5 shrink-0 text-white/80 group-hover:text-green-400 transition-colors" />
+                  <div>
+                    <div className="text-sm font-semibold text-white group-hover:text-green-400 transition-colors" style={{ color: 'inherit' }}>{tool.title}</div>
+                    <div className="text-xs text-white/50">{tool.intro}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="glass-card rounded-2xl p-7">
+            <div className="flex items-center gap-3 mb-4">
+              <SiteIcon name="videoCategory" className="w-6 h-6 text-green-400" />
+              <h2 className="text-2xl font-bold text-white">{copy.shared.categories.videoTools} + {copy.shared.categories.audioTools}</h2>
+            </div>
+            <p className="text-sm text-white/65 leading-relaxed mb-6">{sectionCopy.utilities}</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {supportingTools.map(tool => (
+                <Link key={tool.slug} href={localizePath(`/${tool.slug}`, locale)} className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-all group">
+                  <SiteIcon name={tool.icon} className="w-6 h-6 mb-3 text-white/85 group-hover:text-green-400 transition-colors" />
+                  <div className="text-sm font-semibold text-white group-hover:text-green-400 transition-colors mb-1" style={{ color: 'inherit' }}>{tool.title}</div>
+                  <div className="text-xs text-white/50">{tool.description}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-5">
           {copy.home.workflows.map(workflow => (
             <div key={workflow.title} className="glass-card rounded-2xl p-6">
@@ -82,7 +160,7 @@ export default function HomePage({ locale }: { locale: Locale }) {
       <section style={{ background: 'rgba(0,0,0,0.1)' }} className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-black text-white text-center mb-12">{copy.home.allTools}</h2>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {categories.map(cat => (
               <div key={cat.label} className="glass-card rounded-2xl p-7">
                 <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">

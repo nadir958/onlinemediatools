@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { getCopy } from '@/lib/copy';
+import { trackEvent } from '@/lib/analytics';
 import { DEFAULT_LOCALE, LOCALES, type Locale, detectLocaleFromPath, localizePath, switchLocalePath } from '@/lib/i18n';
 
 function menuAria(locale: Locale, open: boolean) {
@@ -51,6 +52,15 @@ export default function Header() {
                 hrefLang={option.target}
                 aria-current={option.active ? 'page' : undefined}
                 title={option.name}
+                onClick={() => {
+                  if (!option.active) {
+                    trackEvent('language_switched', {
+                      from_locale: locale,
+                      to_locale: option.target,
+                      switch_location: 'header_desktop',
+                    });
+                  }
+                }}
                 className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
                   option.active ? 'bg-white text-[#0f4fc4]' : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
@@ -84,7 +94,16 @@ export default function Header() {
                   href={option.href}
                   hrefLang={option.target}
                   aria-current={option.active ? 'page' : undefined}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    if (!option.active) {
+                      trackEvent('language_switched', {
+                        from_locale: locale,
+                        to_locale: option.target,
+                        switch_location: 'header_mobile',
+                      });
+                    }
+                    setOpen(false);
+                  }}
                   className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
                     option.active ? 'bg-white text-[#0f4fc4]' : 'text-white/85 hover:text-white hover:bg-white/10'
                   }`}

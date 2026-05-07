@@ -5,6 +5,7 @@ import { getCopy } from '@/lib/copy';
 import type { Locale } from '@/lib/i18n';
 import { Tool } from '@/lib/tools';
 import { submitJob, JobStatus } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
 import ToolOptions from './ToolOptions';
 import JobStatusComp from './JobStatus';
 import DownloadResult from './DownloadResult';
@@ -46,6 +47,13 @@ export default function ToolUpload({ tool, locale }: { tool: Tool; locale: Local
     }
     setError('');
     setFile(candidate);
+    trackEvent('tool_file_selected', {
+      tool_slug: tool.slug,
+      tool_type: tool.toolType,
+      locale,
+      file_extension: extension,
+      file_size_bytes: candidate.size,
+    });
     return true;
   }, [tool.accepts, copy.unsupportedType]);
 
@@ -92,10 +100,31 @@ export default function ToolUpload({ tool, locale }: { tool: Tool; locale: Local
     setCompleted(null);
 
     try {
+      trackEvent('tool_job_submit_clicked', {
+        tool_slug: tool.slug,
+        tool_type: tool.toolType,
+        locale,
+        output_format: tool.outputFormat,
+        has_options: Object.keys(options).length > 0,
+      });
       const job = await submitJob(file, tool.toolType, options, copy.uploadFailed);
       setJobId(job.job_id);
+      trackEvent('tool_job_created', {
+        tool_slug: tool.slug,
+        tool_type: tool.toolType,
+        locale,
+        job_id: job.job_id,
+        output_format: tool.outputFormat,
+      });
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : copy.uploadFailed);
+      const message = e instanceof Error ? e.message : copy.uploadFailed;
+      setError(message);
+      trackEvent('tool_job_create_failed', {
+        tool_slug: tool.slug,
+        tool_type: tool.toolType,
+        locale,
+        error_message: message,
+      });
     } finally {
       setLoading(false);
     }
@@ -167,7 +196,7 @@ export default function ToolUpload({ tool, locale }: { tool: Tool; locale: Local
         </div>
       ) : (
         <div>
-          <JobStatusComp jobId={jobId} onComplete={setCompleted} locale={locale} />
+          <JobStatusComp jobId={jobId} onComplete={setCompleted} locale={locale} toolSlug={tool.slug} toolType={tool.toolType} />
           {completed && <DownloadResult job={completed} locale={locale} />}
           <button onClick={reset} className="mt-5 text-sm text-white/50 hover:text-white underline decoration-dotted transition-colors">
             {copy.processAnother}

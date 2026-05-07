@@ -2,16 +2,58 @@ import { notFound } from 'next/navigation';
 import SiteIcon from '@/components/SiteIcon';
 import FAQ from '@/components/FAQ';
 import RelatedTools from '@/components/RelatedTools';
+import RelatedGuides from '@/components/RelatedGuides';
 import ToolUpload from '@/components/ToolUpload';
 import { getCopy } from '@/lib/copy';
 import { localizePath, type Locale } from '@/lib/i18n';
 import { buildBreadcrumbSchema, buildFaqSchema, buildToolSchema } from '@/lib/seo';
+import { TOOL_TO_GUIDE_MAP } from '@/lib/seo-clusters';
 import { getToolBySlug } from '@/lib/tools';
+
+function aiPositioningCopy(locale: Locale) {
+  if (locale === 'fr') {
+    return {
+      title: 'Pourquoi utiliser cet outil IA',
+      cards: [
+        { title: 'Pense pour la voix et la publication', body: 'Ce workflow est utile pour les reunions, interviews, podcasts, sous-titres, resumes et livrables video.' },
+        { title: 'Sortie directement exploitable', body: 'Le resultat peut ensuite etre relu, publie, localise ou reinjecte dans vos workflows de montage et de documentation.' },
+        { title: 'Test rapide sans compte', body: 'Vous pouvez valider un cas d usage ou traiter un besoin ponctuel sans inscription, avec suppression automatique des fichiers.' },
+      ],
+      workflowTitle: 'Comment cette page s integre au workflow',
+      workflowBody: 'Pour beaucoup d equipes, l etape IA vient avant la conversion, la compression ou la publication. Nettoyez eventuellement l audio, generez une transcription ou des sous-titres, puis utilisez les utilitaires media lies ci-dessous pour finaliser le fichier.',
+    };
+  }
+  if (locale === 'es') {
+    return {
+      title: 'Por que usar esta herramienta IA',
+      cards: [
+        { title: 'Pensada para voz y publicacion', body: 'Este flujo es util para reuniones, entrevistas, podcasts, subtitulos, resumenes y entregables de video.' },
+        { title: 'Salida lista para trabajar', body: 'Despues puedes revisar el resultado, publicarlo, localizarlo o integrarlo en flujos de edicion y documentacion.' },
+        { title: 'Prueba rapida sin cuenta', body: 'Puedes validar un caso de uso o resolver una tarea puntual sin registro, con eliminacion automatica de archivos.' },
+      ],
+      workflowTitle: 'Como encaja esta pagina en el flujo',
+      workflowBody: 'En muchos equipos, el paso IA llega antes de convertir, comprimir o publicar. Si hace falta, limpia primero el audio, luego genera la transcripcion o los subtitulos y despues usa las utilidades multimedia relacionadas para preparar la entrega final.',
+    };
+  }
+  return {
+    title: 'Why use this AI tool',
+    cards: [
+      { title: 'Built for speech and publishing workflows', body: 'This flow is useful for meetings, interviews, podcasts, subtitles, summaries, and video publishing deliverables.' },
+      { title: 'Output you can work with immediately', body: 'The result can be reviewed, published, localized, or passed into editing, documentation, or distribution steps right away.' },
+      { title: 'Fast testing without an account', body: 'You can validate a use case or handle a one-off job without signup, while keeping automatic file deletion in place.' },
+    ],
+    workflowTitle: 'Where this page fits in the workflow',
+    workflowBody: 'For many teams, the AI step comes before conversion, compression, or publishing. Clean the audio if needed, generate the transcript or subtitles, then use the related media utilities below to prepare the final deliverable.',
+  };
+}
 
 export default function ToolPageView({ locale, toolSlug }: { locale: Locale; toolSlug: string }) {
   const tool = getToolBySlug(toolSlug, locale);
   if (!tool) notFound();
   const copy = getCopy(locale);
+  const aiCopy = aiPositioningCopy(locale);
+  const isAiTool = tool.category === 'ai';
+  const relatedGuideSlugs = TOOL_TO_GUIDE_MAP[tool.slug] || [];
 
   return (
     <>
@@ -34,9 +76,27 @@ export default function ToolPageView({ locale, toolSlug }: { locale: Locale; too
           <p className="text-lg text-white/60 max-w-2xl mx-auto">{tool.intro}</p>
         </div>
 
+        {isAiTool ? (
+          <section className="grid md:grid-cols-3 gap-4 mb-10">
+            {aiCopy.cards.map(card => (
+              <div key={card.title} className="glass-card rounded-2xl p-5">
+                <h2 className="text-lg font-bold text-white mb-2">{card.title}</h2>
+                <p className="text-sm text-white/65 leading-relaxed">{card.body}</p>
+              </div>
+            ))}
+          </section>
+        ) : null}
+
         <div className="glass-card rounded-3xl p-7 sm:p-10 mb-14">
           <ToolUpload tool={tool} locale={locale} />
         </div>
+
+        {isAiTool ? (
+          <section className="mb-14 glass-card rounded-2xl p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">{aiCopy.workflowTitle}</h2>
+            <p className="text-sm text-white/65 leading-relaxed">{aiCopy.workflowBody}</p>
+          </section>
+        ) : null}
 
         <section className="mb-14">
           <h2 className="text-2xl font-bold text-white mb-6">{copy.shared.howToPrefix} {tool.title}</h2>
@@ -93,6 +153,7 @@ export default function ToolPageView({ locale, toolSlug }: { locale: Locale; too
         </div>
 
         <FAQ items={tool.faq} title={copy.shared.faqTitle} />
+        {relatedGuideSlugs.length ? <RelatedGuides slugs={relatedGuideSlugs} locale={locale} /> : null}
         <RelatedTools slugs={tool.related} locale={locale} />
       </div>
     </>

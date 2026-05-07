@@ -11,15 +11,15 @@ const OPEN_GRAPH_LOCALES: Record<Locale, string> = {
 };
 
 const HOME_TITLES: Record<Locale, string> = {
-  en: 'Free Online Video & Audio Tools',
-  fr: 'Convertisseur vidéo et audio gratuit en ligne',
-  es: 'Convertidor de video y audio gratis online',
+  en: 'AI Transcription, Subtitle & Media Tools Online',
+  fr: 'Transcription IA, sous-titres et outils média en ligne',
+  es: 'Transcripción IA, subtítulos y herramientas multimedia online',
 };
 
 const TOOLS_TITLES: Record<Locale, string> = {
-  en: 'All Free Online Media Tools',
-  fr: 'Tous les outils vidéo et audio en ligne',
-  es: 'Todas las herramientas de video y audio online',
+  en: 'AI Transcription, Subtitle & Media Tools',
+  fr: 'Outils IA de transcription, sous-titres et média',
+  es: 'Herramientas IA de transcripción, subtítulos y multimedia',
 };
 
 function withLeadingSlash(path: string) {

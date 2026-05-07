@@ -2,6 +2,7 @@
 import { getCopy } from '@/lib/copy';
 import type { Locale } from '@/lib/i18n';
 import { JobStatus } from '@/lib/api';
+import { trackEvent } from '@/lib/analytics';
 
 interface Props {
   job: JobStatus;
@@ -21,6 +22,7 @@ export default function DownloadResult({ job, locale }: Props) {
       <a
         href={job.download_url}
         download
+        onClick={() => trackEvent('tool_file_downloaded', { job_id: job.job_id, file_name: job.original_filename })}
         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,7 +32,7 @@ export default function DownloadResult({ job, locale }: Props) {
       </a>
       {job.expires_at && (
         <p className="text-xs text-slate-400 mt-3">
-          {formatText(copy.availableUntil, { time: new Date(job.expires_at).toLocaleTimeString(locale === 'fr' ? 'fr-FR' : 'en-US') })}
+          {formatText(copy.availableUntil, { time: new Date(job.expires_at).toLocaleTimeString(locale === 'fr' ? 'fr-FR' : locale === 'es' ? 'es-ES' : 'en-US') })}
         </p>
       )}
     </div>

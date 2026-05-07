@@ -89,6 +89,8 @@ services:
         API_URL: ${API_URL}
     restart: unless-stopped
     env_file: .env
+    environment:
+      GA_MEASUREMENT_ID: ${GA_MEASUREMENT_ID}
     networks:
       - omt_net
     expose:
