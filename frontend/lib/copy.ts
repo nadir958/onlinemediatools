@@ -31,10 +31,10 @@ export const COMMON_COPY = {
     brandTagline: 'Free online video & audio tools. Convert, compress, extract, and optimize your media files.',
     nav: [
       ['All Tools', '/tools'],
-      ['WebM to MP4', '/webm-to-mp4'],
+      ['Download Video', '/download-video'],
       ['Transcribe Audio', '/transcribe-audio'],
       ['Auto Subtitles', '/auto-subtitle'],
-      ['Compress', '/compress-video'],
+      ['WebM to MP4', '/webm-to-mp4'],
     ],
     mobileNav: [
       ['All Tools', '/tools'],
@@ -184,10 +184,10 @@ export const COMMON_COPY = {
     brandTagline: 'Outils vidéo et audio gratuits en ligne. Convertissez, compressez, extrayez et optimisez vos fichiers média.',
     nav: [
       ['Tous les outils', '/tools'],
-      ['WebM vers MP4', '/webm-to-mp4'],
+      ['Telecharger une video', '/fr/telecharger-video'],
       ['Transcrire un audio', '/transcribe-audio'],
       ['Sous-titres auto', '/auto-subtitle'],
-      ['Compresser', '/compress-video'],
+      ['WebM vers MP4', '/webm-to-mp4'],
     ],
     mobileNav: [
       ['Tous les outils', '/tools'],
@@ -337,10 +337,10 @@ export const COMMON_COPY = {
     brandTagline: 'Herramientas gratis online para video y audio. Convierte, comprime, extrae y optimiza tus archivos multimedia.',
     nav: [
       ['Todas las herramientas', '/tools'],
-      ['WebM a MP4', '/webm-to-mp4'],
+      ['Descargar video', '/es/descargar-video'],
       ['Transcribir audio', '/transcribe-audio'],
-      ['Subtítulos automáticos', '/auto-subtitle'],
-      ['Comprimir', '/compress-video'],
+      ['Subtitulos automaticos', '/auto-subtitle'],
+      ['WebM a MP4', '/webm-to-mp4'],
     ],
     mobileNav: [
       ['Todas las herramientas', '/tools'],
