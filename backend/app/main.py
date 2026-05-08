@@ -127,7 +127,7 @@ async def _create_job(file: UploadFile, tool_type: str, options: str):
     process_media.apply_async(args=[job_id, input_path, output_path, normalized_tool, opts], queue="media_jobs")
 
     return {
-        "job_id": job_id,
+        "job_id": job_id_str,
         "status": "pending",
         "progress": 0,
         "original_filename": file.filename or "upload",
@@ -211,11 +211,13 @@ async def create_url_job(request: UrlJobRequest):
     url = request.url.strip()
     if not url.startswith(("http://", "https://")):
         raise HTTPException(status_code=400, detail="Invalid URL. Please provide a valid http/https URL.")
-    job_id = str(uuid.uuid4())
     db = SessionLocal()
     try:
+        import uuid as _uuid_import
+        job_uuid = _uuid_import.uuid4()
+        job_id_str = str(job_uuid)
         job = Job(
-            job_id=job_id,
+            id=job_uuid,
             tool_type="download-url",
             original_filename=url[:200],
             status="pending",
@@ -226,9 +228,9 @@ async def create_url_job(request: UrlJobRequest):
         db.commit()
     finally:
         db.close()
-    download_from_url.delay(job_id, url, request.format)
+    download_from_url.delay(job_id_str, url, request.format)
     return {
-        "job_id": job_id,
+        "job_id": job_id_str,
         "status": "pending",
         "progress": 0,
         "original_filename": url[:80],

@@ -113,7 +113,7 @@ def download_from_url(self, job_id: str, url: str, format_type: str = "video"):
     
     try:
         from app.models import Job
-        job = db.query(Job).filter(Job.job_id == job_id).first()
+        import uuid as _u; job = db.query(Job).filter(Job.id == _u.UUID(job_id)).first()
         if not job:
             return
         job.status = "processing"
