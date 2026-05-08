@@ -127,7 +127,7 @@ async def _create_job(file: UploadFile, tool_type: str, options: str):
     process_media.apply_async(args=[job_id, input_path, output_path, normalized_tool, opts], queue="media_jobs")
 
     return {
-        "job_id": job_id_str,
+        "job_id": job_id,
         "status": "pending",
         "progress": 0,
         "original_filename": file.filename or "upload",
@@ -145,8 +145,12 @@ def _serialize_job(job_id: str):
     status_value = job.status.value if hasattr(job.status, "value") else str(job.status)
     download_url = None
     if status_value == "completed":
+        # For regular jobs: look for {job_id}_out.*
         files = glob(os.path.join(STORAGE_DIR, f"{job_id}_out.*"))
         if files:
+            download_url = f"/api/download/{job_id}"
+        # For download-url jobs: output_path is stored in DB (different filename)
+        elif job.output_path and os.path.exists(job.output_path):
             download_url = f"/api/download/{job_id}"
 
     return {
@@ -182,6 +186,13 @@ async def get_job(job_id: str):
 @app.get("/api/v1/jobs/{job_id}/download")
 async def download_job(job_id: str):
     files = glob(os.path.join(STORAGE_DIR, f"{job_id}_out.*"))
+    # Fallback: check output_path stored in DB (for download-url jobs)
+    if not files:
+        db2 = SessionLocal()
+        job2 = db2.query(Job).filter(Job.id == job_id).first()
+        db2.close()
+        if job2 and job2.output_path and os.path.exists(job2.output_path):
+            files = [job2.output_path]
     if not files:
         raise HTTPException(404, "File not found")
 

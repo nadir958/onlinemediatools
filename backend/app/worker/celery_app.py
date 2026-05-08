@@ -95,9 +95,10 @@ def process_media(self, job_id: str, input_path: str, output_path: str, tool_typ
         job.status = "failed"
         job.error_message = str(e)
         
+    final_status = job.status.value if hasattr(job.status, "value") else str(job.status)
     db.commit()
     db.close()
-    return job.status
+    return final_status
 
 
 @celery.task(name="download_from_url", bind=True, max_retries=2)
