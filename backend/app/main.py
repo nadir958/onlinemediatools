@@ -205,10 +205,25 @@ async def download_job(job_id: str):
     base_name = os.path.splitext(orig_name)[0]
     out_ext = os.path.splitext(out_path)[1]
 
+    # Set correct MIME type based on extension
+    mime_types = {
+        ".mp3": "audio/mpeg",
+        ".mp4": "video/mp4",
+        ".webm": "video/webm",
+        ".mov": "video/quicktime",
+        ".avi": "video/x-msvideo",
+        ".wav": "audio/wav",
+        ".m4a": "audio/mp4",
+        ".srt": "text/plain",
+        ".vtt": "text/vtt",
+    }
+    media_type = mime_types.get(out_ext.lower(), "application/octet-stream")
+
     return FileResponse(
         out_path,
         filename=f"{base_name}_OnlineMediaTools{out_ext}",
         content_disposition_type="attachment",
+        media_type=media_type,
     )
 
 class UrlJobRequest(BaseModel):
