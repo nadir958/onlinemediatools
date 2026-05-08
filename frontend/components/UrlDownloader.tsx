@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
-import { getCopy, type Locale } from '@/lib/copy';
+import { getCopy } from '@/lib/copy';
+import { type Locale } from '@/lib/i18n';
 import { pollJob, getDownloadUrl } from '@/lib/api';
 
 const API_URL = '/api';
