@@ -177,44 +177,6 @@ async def get_job(job_id: str):
 
 
 
-
-class UrlJobRequest(BaseModel):
-    url: str
-    format: str = "video"  # "video" or "audio"
-
-@app.post("/api/url-jobs")
-def create_url_job(request: UrlJobRequest, db: Session = Depends(get_db)):
-    """Create a download job from a URL (yt-dlp)."""
-    import uuid as _uuid
-    from app.worker.celery_app import download_from_url
-    
-    url = request.url.strip()
-    if not url.startswith(("http://", "https://")):
-        raise HTTPException(status_code=400, detail="Invalid URL. Please provide a valid http/https URL.")
-    
-    job_id = str(_uuid.uuid4())
-    job = Job(
-        job_id=job_id,
-        tool_type="download-url",
-        original_filename=url[:200],
-        status="pending",
-        input_path="",
-        output_path="",
-    )
-    db.add(job)
-    db.commit()
-    
-    download_from_url.delay(job_id, url, request.format)
-    
-    return {
-        "job_id": job_id,
-        "status": "pending",
-        "progress": 0,
-        "original_filename": url[:80],
-        "download_url": None,
-        "expires_at": None,
-    }
-
 @app.get("/api/download/{job_id}")
 @app.get("/api/jobs/{job_id}/download")
 @app.get("/api/v1/jobs/{job_id}/download")
@@ -237,3 +199,39 @@ async def download_job(job_id: str):
         filename=f"{base_name}_OnlineMediaTools{out_ext}",
         content_disposition_type="attachment",
     )
+
+class UrlJobRequest(BaseModel):
+    url: str
+    format: str = "video"
+
+@app.post("/api/url-jobs")
+async def create_url_job(request: UrlJobRequest):
+    """Download video or audio from URL using yt-dlp."""
+    from app.worker.celery_app import download_from_url
+    url = request.url.strip()
+    if not url.startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail="Invalid URL. Please provide a valid http/https URL.")
+    job_id = str(uuid.uuid4())
+    db = SessionLocal()
+    try:
+        job = Job(
+            job_id=job_id,
+            tool_type="download-url",
+            original_filename=url[:200],
+            status="pending",
+            input_path="",
+            output_path="",
+        )
+        db.add(job)
+        db.commit()
+    finally:
+        db.close()
+    download_from_url.delay(job_id, url, request.format)
+    return {
+        "job_id": job_id,
+        "status": "pending",
+        "progress": 0,
+        "original_filename": url[:80],
+        "download_url": None,
+        "expires_at": None,
+    }
