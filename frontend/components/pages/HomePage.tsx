@@ -37,7 +37,7 @@ export default function HomePage({ locale }: { locale: Locale }) {
   const sectionCopy = homeSectionDescriptions(locale);
   const categories = [
     { label: copy.shared.categories.aiTools, icon: 'aiCategory' as const, tools: featuredAiSlugs },
-    { label: copy.shared.categories.videoTools, icon: 'videoCategory' as const, tools: ['webm-to-mp4', 'mov-to-mp4', 'compress-video', 'trim-video', 'video-converter'] },
+    { label: copy.shared.categories.videoTools, icon: 'videoCategory' as const, tools: ['download-video', 'webm-to-mp4', 'mov-to-mp4', 'compress-video', 'trim-video', 'video-converter'] },
     { label: copy.shared.categories.audioTools, icon: 'audioCategory' as const, tools: ['mp4-to-mp3', 'video-to-mp3', 'extract-audio', 'remove-audio-from-video', 'audio-converter'] },
   ];
 

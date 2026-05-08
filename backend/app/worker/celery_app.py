@@ -99,6 +99,83 @@ def process_media(self, job_id: str, input_path: str, output_path: str, tool_typ
     db.close()
     return job.status
 
+
+@celery.task(name="download_from_url", bind=True, max_retries=2)
+def download_from_url(self, job_id: str, url: str, format_type: str = "video"):
+    """Download video or audio from URL using yt-dlp (max 480p for video)."""
+    import subprocess, os, uuid
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:////app/storage/jobs.db")
+    engine = create_engine(DATABASE_URL)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    
+    try:
+        from app.models import Job
+        job = db.query(Job).filter(Job.job_id == job_id).first()
+        if not job:
+            return
+        job.status = "processing"
+        db.commit()
+
+        STORAGE = "/app/storage"
+        out_id = str(uuid.uuid4())
+
+        if format_type == "audio":
+            output_path = f"{STORAGE}/{out_id}_out.mp3"
+            cmd = [
+                "yt-dlp",
+                "--no-playlist",
+                "--extract-audio",
+                "--audio-format", "mp3",
+                "--audio-quality", "5",
+                "--output", output_path.replace(".mp3", ".%(ext)s"),
+                "--no-warnings",
+                "--quiet",
+                url,
+            ]
+            # yt-dlp adds extension, find the file
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True, timeout=300)
+            # Find the actual output file
+            import glob
+            pattern = output_path.replace(".mp3", ".*")
+            files = glob.glob(pattern)
+            if files:
+                actual_file = files[0]
+                if actual_file != output_path:
+                    os.rename(actual_file, output_path)
+        else:
+            output_path = f"{STORAGE}/{out_id}_out.mp4"
+            cmd = [
+                "yt-dlp",
+                "--no-playlist",
+                # Max 480p, prefer mp4
+                "--format", "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480][ext=mp4]/best[height<=480]/best",
+                "--merge-output-format", "mp4",
+                "--output", output_path,
+                "--no-warnings",
+                "--quiet",
+                url,
+            ]
+            subprocess.run(cmd, check=True, capture_output=True, text=True, timeout=300)
+
+        job.output_path = output_path
+        job.status = "completed"
+        db.commit()
+
+    except subprocess.CalledProcessError as e:
+        job.status = "failed"
+        job.error_message = f"Download failed: {e.stderr[:200] if e.stderr else 'Unknown error'}"
+        db.commit()
+    except Exception as e:
+        job.status = "failed"
+        job.error_message = str(e)[:300]
+        db.commit()
+    finally:
+        db.close()
+    return job_id
+
 @celery.task(name="cleanup_files")
 def cleanup_files():
     import time

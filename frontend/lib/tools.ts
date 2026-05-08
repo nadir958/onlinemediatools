@@ -33,6 +33,42 @@ export interface Tool {
 
 const EN_TOOLS: Tool[] = [
   {
+    slug: 'download-video',
+    title: 'Video Downloader',
+    h1: 'Online Video Downloader',
+    description: 'Download videos and audio from YouTube, TikTok, Twitter, Instagram and 1000+ sites.',
+    metaTitle: 'Video Downloader Online - Free | OnlineMediaTools',
+    metaDescription: 'Download video or audio from YouTube, TikTok, Twitter/X, Instagram, Vimeo and 1000+ sites. Free online downloader, no signup.',
+    icon: 'videoCategory',
+    accepts: ['.url'],
+    outputFormat: 'mp4',
+    toolType: 'download-url',
+    actionLabel: 'Download',
+    outputNote: 'Video downloaded as MP4 up to 480p. Audio extracted as MP3.',
+    useCases: [
+      'Download YouTube videos for offline viewing.',
+      'Extract audio from any video as MP3.',
+      'Download TikTok, Instagram Reels or Twitter videos.',
+      'Save Vimeo or Dailymotion videos.',
+    ],
+    related: ['mp4-to-mp3', 'extract-audio', 'transcribe-audio', 'compress-video'],
+    intro: 'Download video or audio from YouTube, TikTok, Twitter/X, Instagram, Vimeo and 1000+ other platforms.',
+    howTo: [
+      'Copy the video URL from YouTube, TikTok, or any supported site',
+      'Paste it in the URL field',
+      'Choose Video (MP4) or Audio (MP3)',
+      'Click Download and wait',
+      'Save your file',
+    ],
+    faq: [
+      { q: 'Which sites are supported?', a: 'YouTube, TikTok, Twitter/X, Instagram, Vimeo, Dailymotion, Facebook, Reddit and 1000+ other sites.' },
+      { q: 'What quality is the video?', a: 'Videos are downloaded at up to 480p MP4.' },
+      { q: 'Can I download audio only?', a: 'Yes. Select Audio (MP3) to get just the audio.' },
+      { q: 'Is it free?', a: 'Yes, completely free with no account required.' },
+    ],
+    category: 'video',
+  },
+  {
     slug: 'webm-to-mp4',
     title: 'WebM to MP4',
     h1: 'WebM to MP4 Converter',

@@ -45,6 +45,7 @@ const SEO_CLUSTER_SLUG_MAP: Record<Exclude<Locale, 'en'>, Record<string, string>
     'clean-interview-audio': 'nettoyer-audio-interview',
     'voice-recording-noise-reduction': 'reduction-bruit-enregistrement-vocal',
     'turboscribe-alternative': 'alternative-turboscribe',
+    'download-video': 'telecharger-video',
   },
   es: {
     'mp3-to-text': 'convertir-mp3-a-texto',
@@ -65,6 +66,7 @@ const SEO_CLUSTER_SLUG_MAP: Record<Exclude<Locale, 'en'>, Record<string, string>
     'clean-interview-audio': 'limpiar-audio-entrevista',
     'voice-recording-noise-reduction': 'reducir-ruido-grabacion-voz',
     'turboscribe-alternative': 'alternativa-turboscribe',
+    'download-video': 'descargar-video',
   },
 };
 
