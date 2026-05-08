@@ -180,8 +180,41 @@ def download_from_url(self, job_id: str, url: str, format_type: str = "video"):
 def cleanup_files():
     import time
     from glob import glob
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:////app/storage/jobs.db")
+    engine = create_engine(DATABASE_URL)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+
     STORAGE = "/app/storage"
     now = time.time()
-    for f in glob(f"{STORAGE}/*"):
-        if os.stat(f).st_mtime < now - 7200:
-            os.remove(f)
+
+    try:
+        from app.models import Job
+        # Delete downloaded files (download-url jobs) after 30 minutes
+        for f in glob(f"{STORAGE}/*"):
+            try:
+                age = now - os.stat(f).st_mtime
+                filename = os.path.basename(f)
+                # Check if this file belongs to a download-url job
+                is_download_job = db.query(Job).filter(
+                    Job.tool_type == "download-url",
+                    Job.output_path == f
+                ).first() is not None
+                if is_download_job and age > 1800:   # 30 minutes
+                    os.remove(f)
+                elif not is_download_job and age > 7200:  # 2 hours for other tools
+                    os.remove(f)
+            except Exception:
+                pass
+    except Exception:
+        # Fallback: delete everything older than 2h
+        for f in glob(f"{STORAGE}/*"):
+            try:
+                if os.stat(f).st_mtime < now - 7200:
+                    os.remove(f)
+            except Exception:
+                pass
+    finally:
+        db.close()

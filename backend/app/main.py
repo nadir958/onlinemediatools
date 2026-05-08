@@ -235,5 +235,5 @@ async def create_url_job(request: UrlJobRequest):
         "progress": 0,
         "original_filename": url[:80],
         "download_url": None,
-        "expires_at": None,
+        "expires_at": (datetime.utcnow() + timedelta(minutes=30)).isoformat(),
     }
