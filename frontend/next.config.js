@@ -4,6 +4,7 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.API_URL || '/api',
     NEXT_PUBLIC_SITE_URL: process.env.FRONTEND_URL || 'https://onlinemediatools.cc',
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.GA_MEASUREMENT_ID || '',
   },
   async headers() {
     return [
@@ -18,4 +19,3 @@ const nextConfig = {
   },
 };
 module.exports = nextConfig;
-

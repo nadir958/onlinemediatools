@@ -57,6 +57,13 @@ function AnalyticsTracker() {
     let active = true;
 
     async function loadConfig() {
+      // Try env var first (fastest, no network request needed)
+      const envId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+      if (envId) {
+        if (active) setMeasurementId(envId);
+        return;
+      }
+      // Fallback: fetch from route handler
       try {
         const response = await fetch('/analytics-config', { cache: 'no-store' });
         if (!response.ok) return;
