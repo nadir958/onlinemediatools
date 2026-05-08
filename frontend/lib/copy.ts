@@ -159,10 +159,8 @@ export const COMMON_COPY = {
       statusFailed: 'Failed to get job status',
     },
     analyticsBanner: {
-      title: 'Allow analytics cookies?',
-      body: 'We use Google Analytics to understand which tools and calls to action perform best. Accepting analytics helps us improve the site. Declining keeps analytics disabled.',
-      accept: 'Accept analytics',
-      decline: 'Decline',
+      body: 'We use analytics to improve your experience. By continuing to use this site, analytics is enabled by default. You can opt out at any time.',
+      decline: 'Disable analytics',
     },
   },
   fr: {
@@ -314,10 +312,8 @@ export const COMMON_COPY = {
       statusFailed: 'Impossible de récupérer le statut du traitement',
     },
     analyticsBanner: {
-      title: 'Autoriser les cookies analytics ?',
-      body: 'Nous utilisons Google Analytics pour comprendre quels outils et appels à l’action performent le mieux. Accepter l’analytics nous aide à améliorer le site. Refuser garde l’analytics désactivé.',
-      accept: 'Accepter l’analytics',
-      decline: 'Refuser',
+      body: 'Nous utilisons des analytics pour ameliorer votre experience. En continuant a utiliser ce site, les analytics sont actives par defaut. Vous pouvez les desactiver a tout moment.',
+      decline: 'Desactiver les analytics',
     },
   },
   es: {
@@ -469,10 +465,8 @@ export const COMMON_COPY = {
       statusFailed: 'No se pudo obtener el estado del proceso',
     },
     analyticsBanner: {
-      title: '¿Permitir cookies de analytics?',
-      body: 'Usamos Google Analytics para entender qué herramientas y llamadas a la acción funcionan mejor. Aceptar analytics nos ayuda a mejorar el sitio. Rechazar mantiene analytics desactivado.',
-      accept: 'Aceptar analytics',
-      decline: 'Rechazar',
+      body: 'Usamos analytics para mejorar tu experiencia. Al continuar usando este sitio, los analytics estan activados por defecto. Puedes desactivarlos en cualquier momento.',
+      decline: 'Desactivar analytics',
     },
   },
 } satisfies Record<Locale, unknown>;

@@ -16,33 +16,27 @@ function bannerLocale(pathname: string): Locale {
 }
 
 export default function CookieConsentBanner() {
-  const [consent, setConsent] = useState<AnalyticsConsentState>('accepted');
   const [isOpen, setIsOpen] = useState(false);
   const [locale, setLocale] = useState<Locale>('en');
 
   useEffect(() => {
-    const stored = getAnalyticsConsent();
-    setConsent(stored);
-    // Only show banner if user has never made a choice (first visit)
+    // Show banner only if user has never made a choice
     const hasChoice = window.localStorage.getItem('omt_analytics_consent_v1');
     setIsOpen(!hasChoice);
     setLocale(bannerLocale(window.location.pathname));
 
     const handleOpenPreferences = () => {
-      setConsent(getAnalyticsConsent());
       setLocale(bannerLocale(window.location.pathname));
       setIsOpen(true);
     };
 
     const handleConsentChanged = (event: Event) => {
       const detail = (event as CustomEvent<AnalyticsConsentState>).detail;
-      const next = detail === 'accepted' || detail === 'declined' ? detail : getAnalyticsConsent();
-      setConsent(next);
+      if (detail === 'declined') setIsOpen(false);
     };
 
     window.addEventListener(OPEN_COOKIE_PREFERENCES_EVENT, handleOpenPreferences);
     window.addEventListener(ANALYTICS_CONSENT_EVENT, handleConsentChanged as EventListener);
-
     return () => {
       window.removeEventListener(OPEN_COOKIE_PREFERENCES_EVENT, handleOpenPreferences);
       window.removeEventListener(ANALYTICS_CONSENT_EVENT, handleConsentChanged as EventListener);
@@ -53,15 +47,14 @@ export default function CookieConsentBanner() {
 
   const copy = getCopy(locale).analyticsBanner;
 
-  const accept = () => {
-    setAnalyticsConsent('accepted');
-    setConsent('accepted');
+  const decline = () => {
+    setAnalyticsConsent('declined');
     setIsOpen(false);
   };
 
-  const decline = () => {
-    setAnalyticsConsent('declined');
-    setConsent('declined');
+  const dismiss = () => {
+    // Dismiss = accept (they chose to continue using the site)
+    setAnalyticsConsent('accepted');
     setIsOpen(false);
   };
 
@@ -72,23 +65,26 @@ export default function CookieConsentBanner() {
         style={{ background: 'rgba(12,17,40,0.96)' }}
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p className="text-white/70 text-sm leading-relaxed flex-1">
+          <p className="text-white/60 text-sm leading-relaxed flex-1">
             {copy.body}
           </p>
           <div className="flex gap-2 shrink-0">
             <button
               type="button"
               onClick={decline}
-              className="px-4 py-2 rounded-xl border border-white/15 text-white/60 hover:text-white hover:bg-white/10 transition-all text-sm"
+              className="px-4 py-2 rounded-xl border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-all text-sm whitespace-nowrap"
             >
               {copy.decline}
             </button>
             <button
               type="button"
-              onClick={accept}
-              className="px-4 py-2 rounded-xl font-semibold text-[#0c1734] bg-white hover:bg-green-200 transition-all text-sm"
+              onClick={dismiss}
+              aria-label="Close"
+              className="p-2 rounded-xl text-white/30 hover:text-white/60 transition-all"
             >
-              {copy.accept}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
         </div>
