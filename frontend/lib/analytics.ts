@@ -13,10 +13,11 @@ declare global {
 export type AnalyticsConsentState = 'accepted' | 'declined' | 'unknown';
 
 export function getAnalyticsConsent(): AnalyticsConsentState {
-  if (typeof window === 'undefined') return 'unknown';
+  if (typeof window === 'undefined') return 'accepted';
   const value = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
   if (value === 'accepted' || value === 'declined') return value;
-  return 'unknown';
+  // Default: accepted (opt-out model — user must actively decline)
+  return 'accepted';
 }
 
 export function setAnalyticsConsent(value: Exclude<AnalyticsConsentState, 'unknown'>) {
